@@ -39,12 +39,11 @@ import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.models.WeatherData;
 import com.example.android.sunshine.app.models.WeatherListObject;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -217,12 +216,17 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         String units = "metric";
         int numDays = 14;
 
-        
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient.Builder httpclient = new OkHttpClient.Builder();
+
+        httpclient.addInterceptor(logging);
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://api.openweathermap.org/")
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
+                .client(httpclient.build())
                 .build();
 
         WeatherApi service = retrofit.create(WeatherApi.class);
